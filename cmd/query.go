@@ -1250,27 +1250,29 @@ $ %s query clients-expiration demo-path`,
 				return err
 			}
 
+			output, _ := cmd.Flags().GetString(flagOutput)
+
 			srcExpiration, srcClientInfo, errSrc := relayer.QueryClientExpiration(cmd.Context(), c[src], c[dst])
 			if errSrc != nil && !strings.Contains(errSrc.Error(), "light client not found") {
 				return errSrc
+			}
+			srcClientExpiration := relayer.SPrintClientExpiration(c[src], srcExpiration, srcClientInfo)
+			if output == formatJson {
+				srcClientExpiration = relayer.SPrintClientExpirationJson(c[src], srcExpiration, srcClientInfo)
+			}
+			if errSrc == nil {
+				fmt.Fprintln(cmd.OutOrStdout(), srcClientExpiration)
 			}
 			dstExpiration, dstClientInfo, errDst := relayer.QueryClientExpiration(cmd.Context(), c[dst], c[src])
 			if errDst != nil && !strings.Contains(errDst.Error(), "light client not found") {
 				return errDst
 			}
 
-			output, _ := cmd.Flags().GetString(flagOutput)
-
-			srcClientExpiration := relayer.SPrintClientExpiration(c[src], srcExpiration, srcClientInfo)
 			dstClientExpiration := relayer.SPrintClientExpiration(c[dst], dstExpiration, dstClientInfo)
 
 			if output == formatJson {
 				srcClientExpiration = relayer.SPrintClientExpirationJson(c[src], srcExpiration, srcClientInfo)
 				dstClientExpiration = relayer.SPrintClientExpirationJson(c[dst], dstExpiration, dstClientInfo)
-			}
-
-			if errSrc == nil {
-				fmt.Fprintln(cmd.OutOrStdout(), srcClientExpiration)
 			}
 
 			if errDst == nil {

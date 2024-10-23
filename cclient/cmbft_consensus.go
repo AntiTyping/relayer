@@ -19,7 +19,7 @@ func (r CometRPCClient) GetBlockTime(ctx context.Context, height uint64) (time.T
 
 	b, err := r.Block(ctx, &h)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("failed to get block: %w", err)
+		return time.Time{}, fmt.Errorf("Failed to get block at height %d with error: %w", height, err)
 	}
 
 	return b.Block.Header.Time, nil

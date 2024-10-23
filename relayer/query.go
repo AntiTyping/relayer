@@ -3,6 +3,7 @@ package relayer
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -288,12 +289,12 @@ func QueryClientExpiration(ctx context.Context, src, dst *Chain) (time.Time, Cli
 
 	clientInfo, err := ClientInfoFromClientState(clientStateRes.ClientState)
 	if err != nil {
-		return time.Time{}, ClientStateInfo{}, err
+		return time.Time{}, ClientStateInfo{}, errors.New(fmt.Sprintf(">>> %s %s", src.PathEnd.ChainID, err.Error()))
 	}
 
 	clientTime, err := dst.ChainProvider.BlockTime(ctx, int64(clientInfo.LatestHeight.GetRevisionHeight()))
 	if err != nil {
-		return time.Time{}, ClientStateInfo{}, err
+		return time.Time{}, ClientStateInfo{}, errors.New(fmt.Sprintf("ChainID: %s - %s", dst.PathEnd.ChainID, err.Error()))
 	}
 
 	return clientTime.Add(clientInfo.TrustingPeriod), clientInfo, nil
